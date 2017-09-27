@@ -1,3 +1,4 @@
+pipeline{
 @Grapes([
     @Grab(group='commons-io', module='commons-io', version='2.5'),
     @Grab('org.codehaus.groovy.modules.http-builder:http-builder:0.7'),
@@ -186,4 +187,5 @@ public String ChamaRestTeste(def teste, String urlTeste, String token){
       //println(obj.data.result);
       return obj.data.result;
     }
+}
 }
