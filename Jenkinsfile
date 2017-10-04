@@ -3,7 +3,7 @@ pipeline {
   stages {
     stage('Teste') {
       steps {
-        echo "Teste funciona"
+        echo "Multbranch pipe"
       }
     }
   }
