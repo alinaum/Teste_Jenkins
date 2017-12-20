@@ -5,6 +5,6 @@ pipeline {
       steps {
         echo "Teste 15 build"
       }
-    }
+    } 
   }
 }
