@@ -60,41 +60,34 @@ node {
         }
 
         stage("Restore") {
-			steps {
-				script {							
-				def proc = bat (script:'''"C:\\Program Files (x86)\\nuget.exe "  restore " C:\\Program Files (x86)\\Jenkins\\jobs\\Pipeline_sintaxe\\branches\\master\\workspace\\C#\\StoreApp.sln"''', returnStatus: true)
-				if (proc == 0){
-					echo "Restore Nuget Packges";
-				}
-				else {
-					emailext attachLog: true, body:" Nuget Restore falhou favor verificar", subject: "Restore", to: EMAIL_TO;
-					currentBuild.result = "FAILURE";
-					error 'Problema no restore do nuget packge';
-				}
-                populateGlobalVariables()
-				}
+			def proc = bat (script:'''"C:\\Program Files (x86)\\nuget.exe "  restore " C:\\Program Files (x86)\\Jenkins\\jobs\\Pipeline_sintaxe\\branches\\master\\workspace\\C#\\StoreApp.sln"''', returnStatus: true)
+			if (proc == 0){
+				echo "Restore Nuget Packges";
 			}
+			else {
+				emailext attachLog: true, body:" Nuget Restore falhou favor verificar", subject: "Restore", to: EMAIL_TO;
+				currentBuild.result = "FAILURE";
+				error 'Problema no restore do nuget packge';
+			}
+               populateGlobalVariables()
 		}	
 
         stage("Build"){
-			steps {
-				script {	
-					def msbuild = tool name: 'MsBuild fw4.0', type: 'hudson.plugins.msbuild.MsBuildInstallation';
-					def proc = bat (script:'''"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe"   "C:\\Program Files (x86)\\Jenkins\\jobs\\Pipeline_sintaxe\\branches\\master\\workspace\\C#\\StoreApp.sln"''', returnStatus: true)
-					echo "Build Execution";
-					if (proc == 0){
-						echo "Build execution";
-						emailext attachLog: true, body:"Build e Commit feito com sussesso", subject: MAIL_SUBJECT_TESTE, to: EMAIL_TO;
-					}
-					else {
-						emailext attachLog: true, body:"Erro no build, por favor verifique o log e reverta o commite caso necessario", subject: "Build", to: EMAIL_TO;
-						currentBuild.result = "FAILURE";
-						error 'Build Solution';
-					}
-                     populateGlobalVariables()
-					}
-				}
+			def msbuild = tool name: 'MsBuild fw4.0', type: 'hudson.plugins.msbuild.MsBuildInstallation';
+			def proc = bat (script:'''"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe"   "C:\\Program Files (x86)\\Jenkins\\jobs\\Pipeline_sintaxe\\branches\\master\\workspace\\C#\\StoreApp.sln"''', returnStatus: true)
+			echo "Build Execution";
+			if (proc == 0){
+				echo "Build execution";
+				emailext attachLog: true, body:"Build e Commit feito com sussesso", subject: MAIL_SUBJECT_TESTE, to: EMAIL_TO;
 			}
+			else {
+				emailext attachLog: true, body:"Erro no build, por favor verifique o log e reverta o commite caso necessario", subject: "Build", to: EMAIL_TO;
+				currentBuild.result = "FAILURE";
+				error 'Build Solution';
+			}
+                   populateGlobalVariables()
+		}
+
 
 			def buildColor = currentBuild.result == null ? "good" : "warning"
             def buildStatus = currentBuild.result == null ? "Success" : currentBuild.result
