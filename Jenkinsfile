@@ -63,137 +63,20 @@ node {
         stage("Restore") {
 			steps {
 				script {							
-					def proc = bat (script:'''"C:\\Program Files (x86)\\nuget.exe "  restore " C:\\Program Files (x86)\\Jenkins\\jobs\\Pipeline_sintaxe\\branches\\master\\workspace\\C#\\StoreApp.sln"''', returnStatus: true)
-					if (proc == 0){
-						echo "Restore Nuget Packges";
-					}
-					else {
-						emailext attachLog: true, body:" Nuget Restore falhou favor verificar", subject: "Restore", to: EMAIL_TO;
-						currentBuild.result = "FAILURE";
-						error 'Problema no restore do nuget packge';
-					}
-                    populateGlobalVariables()
+				def proc = bat (script:'''"C:\\Program Files (x86)\\nuget.exe "  restore " C:\\Program Files (x86)\\Jenkins\\jobs\\Pipeline_sintaxe\\branches\\master\\workspace\\C#\\StoreApp.sln"''', returnStatus: true)
+				if (proc == 0){
+					echo "Restore Nuget Packges";
+				}
+				else {
+					emailext attachLog: true, body:" Nuget Restore falhou favor verificar", subject: "Restore", to: EMAIL_TO;
+					currentBuild.result = "FAILURE";
+					error 'Problema no restore do nuget packge';
+				}
+                populateGlobalVariables()
+				}
+			}
+		}	
 
-                    def buildColor = currentBuild.result == null ? "good" : "warning"
-                    def buildStatus = currentBuild.result == null ? "Success" : currentBuild.result
-                    def jobName = "${env.JOB_NAME}"
-
-                    // Strip the branch name out of the job name (ex: "Job Name/branch1" -> "Job Name")
-                    jobName = jobName.getAt(0..(jobName.indexOf('/') - 1))
-                
-                    if (failed > 0) {
-                        buildStatus = "Failed"
-
-                        if (isPublishingBranch()) {
-                            buildStatus = "MasterFailed"
-                        }
-
-                        buildColor = "danger"
-                        def failedTestsString = getFailedTests()
-
-                        notifySlack("", slackNotificationChannel, [
-                            [
-                                title: "${jobName}, build #${env.BUILD_NUMBER}",
-                                title_link: "${env.BUILD_URL}",
-                                color: "${buildColor}",
-                                text: "${buildStatus}\n${author}",
-                                "mrkdwn_in": ["fields"],
-                                fields: [
-                                    [
-                                        title: "Branch",
-                                        value: "${env.GIT_BRANCH}",
-                                        short: true
-                                    ],
-                                    [
-                                        title: "Test Results",
-                                        value: "${testSummary}",
-                                        short: true
-                                    ],
-                                    [
-                                        title: "Last Commit",
-                                        value: "${message}",
-                                        short: false
-                                    ]
-                                ]
-                            ],
-                            [
-                                title: "Failed Tests",
-                                color: "${buildColor}",
-                                text: "${failedTestsString}",
-                                "mrkdwn_in": ["text"],
-                            ]
-                        ])          
-                    } else {
-                        notifySlack("", slackNotificationChannel, [
-                            [
-                                title: "${jobName}, build #${env.BUILD_NUMBER}",
-                                title_link: "${env.BUILD_URL}",
-                                color: "${buildColor}",
-                                author_name: "${author}",
-                                text: "${buildStatus}\n${author}",
-                                fields: [
-                                    [
-                                        title: "Branch",
-                                        value: "${env.GIT_BRANCH}",
-                                        short: true
-                                    ],
-                                    [
-                                        title: "Last Commit",
-                                        value: "${message}",
-                                        short: false
-                                    ]
-                                ]
-                            ]
-                        ])
-                    }
-        
-        if (isPublishingBranch() && isResultGoodForPublishing()) {
-            stage ('Publish') {
-                sh "./gradlew ${gradleDefaultSwitches}"
-            }
-        }
-}
-    } catch (hudson.AbortException ae) {
-        // I ignore aborted builds, but you're welcome to notify Slack here
-    } catch (e) {
-        def buildStatus = "Failed"
-
-        if (isPublishingBranch()) {
-            buildStatus = "MasterFailed"
-        }
-
-        notifySlack("", slackNotificationChannel, [
-            [
-                title: "${env.JOB_NAME}, build #${env.BUILD_NUMBER}",
-                title_link: "${env.BUILD_URL}",
-                color: "danger",
-                author_name: "${author}",
-                text: "${buildStatus}",
-                fields: [
-                    [
-                        title: "Branch",
-                        value: "${env.GIT_BRANCH}",
-                        short: true
-                    ],
-                    [
-                        title: "Last Commit",
-                        value: "${message}",
-                        short: false
-                    ],
-                    [
-                        title: "Error",
-                        value: "${e}",
-                        short: false
-                    ]
-                ]
-            ]
-        ])
-
-        throw e
-        }
-	}
-}
-	
         stage("Build"){
 			steps {
 				script {	
@@ -209,9 +92,12 @@ node {
 						currentBuild.result = "FAILURE";
 						error 'Build Solution';
 					}
-                               populateGlobalVariables()
+                     populateGlobalVariables()
+					}
+				}
+			}
 
-            def buildColor = currentBuild.result == null ? "good" : "warning"
+			def buildColor = currentBuild.result == null ? "good" : "warning"
             def buildStatus = currentBuild.result == null ? "Success" : currentBuild.result
             def jobName = "${env.JOB_NAME}"
 
@@ -283,14 +169,12 @@ node {
                     ]
                 ])
             }
-        }
         
-        if (isPublishingBranch() && isResultGoodForPublishing()) {
-            stage ('Publish') {
-                sh "./gradlew ${gradleDefaultSwitches}"
-            }
-        }
-}
+			if (isPublishingBranch() && isResultGoodForPublishing()) {
+				stage ('Publish') {
+					sh "./gradlew ${gradleDefaultSwitches}"
+				}
+			}
     } catch (hudson.AbortException ae) {
         // I ignore aborted builds, but you're welcome to notify Slack here
     } catch (e) {
@@ -333,4 +217,3 @@ node {
 	}
 }	
  
-}
