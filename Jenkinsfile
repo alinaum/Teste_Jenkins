@@ -152,6 +152,7 @@ node {
                 sh "./gradlew ${gradleDefaultSwitches}"
             }
         }
+}
     } catch (hudson.AbortException ae) {
         // I ignore aborted builds, but you're welcome to notify Slack here
     } catch (e) {
@@ -289,6 +290,7 @@ node {
                 sh "./gradlew ${gradleDefaultSwitches}"
             }
         }
+}
     } catch (hudson.AbortException ae) {
         // I ignore aborted builds, but you're welcome to notify Slack here
     } catch (e) {
