@@ -13,29 +13,11 @@ node {
 
         stage("Restore") {
 			def proc = bat (script:'''"C:\\Program Files (x86)\\nuget.exe "  restore " C:\\Program Files (x86)\\Jenkins\\jobs\\New_notification_test\\branches\\master\\workspace\\C#\\StoreApp.sln"''', returnStatus: true)
-			if (proc == 0){
-				echo "Restore Nuget Packges";
-			}
-			else {
-				emailext attachLog: true, body:" Nuget Restore falhou favor verificar", subject: "Restore", to: "aline.campos@ventron.com.br";
-				currentBuild.result = "FAILURE";
-				error 'Problema no restore do nuget packge';
-			}
-		}	
-
+		}
         stage("Build"){
 			def msbuild = tool name: 'MsBuild fw4.0', type: 'hudson.plugins.msbuild.MsBuildInstallation';
 			def proc = bat (script:'''"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe"   "C:\\Program Files (x86)\\Jenkins\\jobs\\New_notification_test\\branches\\master\\workspace\\C#\\StoreApp.sln"''', returnStatus: true)
 			echo "Build Execution";
-			if (proc == 0){
-				echo "Build execution";
-				emailext attachLog: true, body:"Build e Commit feito com sussesso", subject: "Build", to: "aline.campos@ventron.com.br";
-			}
-			else {
-				emailext attachLog: true, body:"Erro no build, por favor verifique o log e reverta o commite caso necessario", subject: "Build", to: EMAIL_TO;
-				currentBuild.result = "FAILURE";
-				error 'Build Solution';
-			}
 		}
 
 
@@ -58,6 +40,8 @@ def notifyBuild(String buildStatus = 'STARTED') {
   def colorCode = '#FF0000'
   def subject = "${buildStatus}: Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
   def summary = "${subject}: Foi publicado usando a branch (${env.BRANCH_NAME})"
+    def details = """<p>STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
+    <p>Check console output at the attachments</p>"""
  
   // Override default values based on build status
   if (buildStatus == 'STARTED') {
@@ -73,5 +57,11 @@ def notifyBuild(String buildStatus = 'STARTED') {
  
   // Send notifications
   slackSend (color: colorCode, message: summary)
- 
+    //email
+  emailext (
+	  attachLog: true,
+      subject: subject,
+      body: details,
+      to: "aline.campos@ventron.com.br"
+    ) 
 }
