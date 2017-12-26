@@ -103,9 +103,6 @@ node {
                     buildStatus = "MasterFailed"
                 }
 
-                buildColor = "danger"
-                def failedTestsString = getFailedTests()
-
                 notifySlack("", slackNotificationChannel, [
                     [
                         title: "${jobName}, build #${env.BUILD_NUMBER}",
@@ -120,23 +117,12 @@ node {
                                 short: true
                             ],
                             [
-                                title: "Test Results",
-                                value: "${testSummary}",
-                                short: true
-                            ],
-                            [
                                 title: "Last Commit",
                                 value: "${message}",
                                 short: false
                             ]
                         ]
                     ],
-                    [
-                        title: "Failed Tests",
-                        color: "${buildColor}",
-                        text: "${failedTestsString}",
-                        "mrkdwn_in": ["text"],
-                    ]
                 ])          
             } else {
                 notifySlack("", slackNotificationChannel, [
