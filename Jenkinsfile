@@ -60,7 +60,7 @@ node {
         }
 
         stage("Restore") {
-			def proc = bat (script:'''"C:\\Program Files (x86)\\nuget.exe "  restore " C:\\Program Files (x86)\\Jenkins\\jobs\\Pipeline_sintaxe\\branches\\master\\workspace\\C#\\StoreApp.sln"''', returnStatus: true)
+			def proc = bat (script:'''"C:\\Program Files (x86)\\nuget.exe "  restore " C:\\Program Files (x86)\\Jenkins\\jobs\\New_notification_test\\branches\\master\\workspace\\C#\\StoreApp.sln"''', returnStatus: true)
 			if (proc == 0){
 				echo "Restore Nuget Packges";
 			}
@@ -74,7 +74,7 @@ node {
 
         stage("Build"){
 			def msbuild = tool name: 'MsBuild fw4.0', type: 'hudson.plugins.msbuild.MsBuildInstallation';
-			def proc = bat (script:'''"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe"   "C:\\Program Files (x86)\\Jenkins\\jobs\\Pipeline_sintaxe\\branches\\master\\workspace\\C#\\StoreApp.sln"''', returnStatus: true)
+			def proc = bat (script:'''"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe"   "C:\\Program Files (x86)\\Jenkins\\jobs\\New_notification_test\\branches\\master\\workspace\\C#\\StoreApp.sln"''', returnStatus: true)
 			echo "Build Execution";
 			if (proc == 0){
 				echo "Build execution";
