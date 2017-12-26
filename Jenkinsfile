@@ -17,7 +17,7 @@ node {
 				echo "Restore Nuget Packges";
 			}
 			else {
-				emailext attachLog: true, body:" Nuget Restore falhou favor verificar", subject: "Restore", to: EMAIL_TO;
+				emailext attachLog: true, body:" Nuget Restore falhou favor verificar", subject: "Restore", to: "aline.campos@ventron.com.br";
 				currentBuild.result = "FAILURE";
 				error 'Problema no restore do nuget packge';
 			}
@@ -29,7 +29,7 @@ node {
 			echo "Build Execution";
 			if (proc == 0){
 				echo "Build execution";
-				emailext attachLog: true, body:"Build e Commit feito com sussesso", subject: MAIL_SUBJECT_TESTE, to: EMAIL_TO;
+				emailext attachLog: true, body:"Build e Commit feito com sussesso", subject: "Build", to: "aline.campos@ventron.com.br";
 			}
 			else {
 				emailext attachLog: true, body:"Erro no build, por favor verifique o log e reverta o commite caso necessario", subject: "Build", to: EMAIL_TO;
@@ -57,9 +57,7 @@ def notifyBuild(String buildStatus = 'STARTED') {
   def colorName = 'RED'
   def colorCode = '#FF0000'
   def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
-  def summary = "${subject} (${env.BUILD_URL})"
-  def details = """<p>STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
-    <p>Check console output at "<a href="${env.BUILD_URL}">${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>"</p>"""
+  def summary = "${subject} (${env.GIT_BRANCH})"
  
   // Override default values based on build status
   if (buildStatus == 'STARTED') {
