@@ -39,7 +39,7 @@ def notifyBuild(String buildStatus = 'STARTED') {
   def colorName = 'RED'
   def colorCode = '#FF0000'
   def subject = "${buildStatus}: Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
-  def summary = "${subject}: Foi publicado usando a branch (${env.BRANCH_NAME})"
+  def summary = "${subject}: Job rodou usando a (${env.BRANCH_NAME})"
     def details = """<p>STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
     <p>Check console output at the attachments</p>"""
  
@@ -59,6 +59,7 @@ def notifyBuild(String buildStatus = 'STARTED') {
   slackSend (color: colorCode, message: summary)
     //email
   emailext (
+	  mimeType: 'text/html',
 	  attachLog: true,
       subject: subject,
       body: details,
