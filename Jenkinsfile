@@ -52,8 +52,7 @@ def populateGlobalVariables = {
     getLastCommitMessage()
     getGitAuthor()
 }
-pipeline {
-  agent any
+
 node {
     try {
         stage('Checkout') {
@@ -215,5 +214,4 @@ node {
         }
 
 	}
-}	
  
