@@ -20,7 +20,7 @@ node {
 			echo "Build Execution";
 		}
 		stage("DLL") {
-			def power = bat (script: 'powershell "'+DLLS", returnStatus: true)
+			def power = bat (script: '''powershell "+DLLS+"''', returnStatus: true)
 		}		
 
   } catch (e) {
