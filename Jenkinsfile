@@ -20,7 +20,7 @@ node {
 			echo "Build Execution";
 		}
 		stage("DLL") {
-      String DLLS = "E:\\ScriptsJenkins\\DDL_files.txt";
+      String DLLS = "E:\\ScriptsJenkins\\Scripts\\git_scripts\\DLL_separator.ps1";
 			def power = bat (script: 'powershell "'+DLLS+'"', returnStatus: true)
 		}		
 
