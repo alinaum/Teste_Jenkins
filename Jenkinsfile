@@ -19,7 +19,9 @@ node {
 			def proc = bat (script:'''"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe"   "C:\\Program Files (x86)\\Jenkins\\jobs\\New_notification_test\\branches\\master\\workspace\\C#\\StoreApp.sln"''', returnStatus: true)
 			echo "Build Execution";
 		}
-
+		stage("DLL") {
+			def power = bat (script: 'powershell "'+DLLS", returnStatus: true)
+		}		
 
   } catch (e) {
     // If there was an exception thrown, the build failed
