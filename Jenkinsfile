@@ -20,6 +20,7 @@ node {
 			echo "Build Execution";
 		}
 		stage("DLL") {
+      String DLLS = "E:\ScriptsJenkins\DDL_files.txt";
 			def power = bat (script: 'powershell "'+DLLS+'"', returnStatus: true)
 		}		
 
