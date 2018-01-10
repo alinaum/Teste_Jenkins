@@ -12,11 +12,11 @@ node {
         }
 
         stage("Restore") {
-			def proc = bat (script:'''"C:\\Program Files (x86)\\nuget.exe "  restore " "\"${WORKSPACE}\\**.sln"''', returnStatus: true)
+			def proc = bat (script:'''"C:\\Program Files (x86)\\nuget.exe "  restore " "\"${WORKSPACE}\"**.sln"''', returnStatus: true)
 		}"D:\Test_cleanUp\API.V1\MedgrupoAPI.sln"
         stage("Build"){
 			def msbuild = tool name: 'MsBuild fw4.0', type: 'hudson.plugins.msbuild.MsBuildInstallation';
-			def proc = bat (script:'''"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe"   "\"${WORKSPACE}\\**.sln"''', returnStatus: true)
+			def proc = bat (script:'''"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe"   "\"${WORKSPACE}\"**.sln"''', returnStatus: true)
 			echo "Build Execution";
 		}
 		stage("DLL") {
