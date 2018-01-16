@@ -106,7 +106,6 @@ node {
 			sleep time: 6, unit: 'MINUTES';
 			String url = RUNSCOPE_TRIGGER;
 			def objRest = ChamaRest(url, RUNSCOPE_TOKEN);
-			echo "chamou"
 			String idTrigger = objRest.data.runs.test_run_id[0].toString();
 			RunScopeDepoisDoLoadBalanceOk = ChamaRestTeste(idTrigger, RUNSCOPE_TESTE, RUNSCOPE_TOKEN);
 			while(RunScopeDepoisDoLoadBalanceOk != "pass" && RunScopeDepoisDoLoadBalanceOk != "fail")
@@ -202,7 +201,7 @@ def notifyBuild(String buildStatus = 'STARTED', String stageName) {
 
 public def ChamaRest(def url, String token){
     URL object = new  URL(url);
-
+	echo "entrou chamaRest"
     HttpURLConnection connection = (HttpURLConnection) object
             .openConnection();
     // int timeOut = connection.getReadTimeout();
