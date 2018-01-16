@@ -204,8 +204,8 @@ public def ChamaRest(def url, String token){
 	
     HttpURLConnection connection = (HttpURLConnection) object
             .openConnection();
-	echo connection
     // int timeOut = connection.getReadTimeout();
+	println(connection);
     connection.setReadTimeout(60 * 1000);
     connection.setConnectTimeout(60 * 1000);
 
@@ -222,7 +222,7 @@ public def ChamaRest(def url, String token){
         
       def jsonSlurper = new JsonSlurper()
       def obj = jsonSlurper.parseText(jsonResponse) 
-      //println(obj.data.result);
+      println(obj.data.result);
       return obj;
     }
 }
