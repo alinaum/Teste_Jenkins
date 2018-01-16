@@ -36,27 +36,29 @@ String RunScopeDepoisDoLoadBalanceOk 		= "";
 
 node {
     try {
+		/*
         stage('Checkout') {
             checkout scm
         }
 		
         stage("Build"){
-			bat (script:'"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\MedgrupoAPI.sln" /property:Configuration=Release', returnStatus: true)
+			bat (script:'"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\MedgrupoAPI.sln" /property:Configuration=Release')
 			echo "Build Execution";
 		}
 		stage("Test") {
-			bat (script:'"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\Medgrupo.RestfulService.Tests\\Ordered\\TrocaDevice.orderedtest"', returnStatus: true)
+			bat (script:'"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\Medgrupo.RestfulService.Tests\\Ordered\\TrocaDevice.orderedtest"')
 			bat (script:'"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\Medgrupo.RestfulService.Tests\\bin\\Release\\Medgrupo.RestfulService.Tests.dll"', returnStatus: true)
 		}	
+		*/
 		stage("Backup"){       
-			bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\backup_script.ps1"' , returnStatus: true)
+			bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\backup_script.ps1"' )
 		}
 		stage("DLL") {
 			String DLLS = "E:\\ScriptsJenkins\\Scripts\\git_scripts\\DLL_separator.ps1";
-			def power = bat (script: 'powershell "'+DLLS+'"', returnStatus: true)
+			bat (script: 'powershell "'+DLLS+'"')
 		}	
 		stage("UploadFTP"){       
-			bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\UPLOAD_FTP.ps1"' , returnStatus: true)
+			bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\UPLOAD_FTP.ps1"')
 		}
 		stage("RunScopeAntes"){
 			String url = RUNSCOPE_TRIGGER;
@@ -67,15 +69,7 @@ node {
 			{
 			RunScopeOk = ChamaRestTeste(idTrigger, RUNSCOPE_TESTE, RUNSCOPE_TOKEN);
 			}
-			
-			if(RunScopeOk == "pass"){
-				echo "ok";
-			}
-			else
-			{
-				echo "Erro no RunScope";
-				exit;
-			}
+
 		}
 		
 		stage("E-mail RunScope"){
