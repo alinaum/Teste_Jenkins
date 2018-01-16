@@ -64,7 +64,6 @@ node {
 		
 		stage("RunScopeAntes"){
 			String url = RUNSCOPE_TRIGGER;
-			echo " passou"
 			def objRest = ChamaRest(url, RUNSCOPE_TOKEN);
 			String idTrigger = objRest.data.runs.test_run_id[0].toString();
 			RunScopeOk = ChamaRestTeste(idTrigger, RUNSCOPE_TESTE, RUNSCOPE_TOKEN);
@@ -107,6 +106,7 @@ node {
 			sleep time: 6, unit: 'MINUTES';
 			String url = RUNSCOPE_TRIGGER;
 			def objRest = ChamaRest(url, RUNSCOPE_TOKEN);
+			echo "chamou"
 			String idTrigger = objRest.data.runs.test_run_id[0].toString();
 			RunScopeDepoisDoLoadBalanceOk = ChamaRestTeste(idTrigger, RUNSCOPE_TESTE, RUNSCOPE_TOKEN);
 			while(RunScopeDepoisDoLoadBalanceOk != "pass" && RunScopeDepoisDoLoadBalanceOk != "fail")
