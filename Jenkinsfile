@@ -209,7 +209,7 @@ public def ChamaRest(def url, String token){
     connection.setReadTimeout(60 * 1000);
     connection.setConnectTimeout(60 * 1000);
 
-    connection.setRequestProperty("Authorization", token);
+    connection.setRequestProperty("Authorization", "Bearer 0c4f724e-5125-4886-a657-f26e0f9db627");
     int responseCode = connection.getResponseCode();
     //String responseMsg = connection.getResponseMessage();
 	println(responseCode);
