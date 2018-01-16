@@ -39,22 +39,22 @@ node {
 		
         stage("Build"){
 			def msbuild = tool name: 'MsBuild fw4.0', type: 'hudson.plugins.msbuild.MsBuildInstallation';
-			bat (msbuild  "C:\Program Files (x86)\Jenkins\jobs\Test_free_git\workspace\MedgrupoAPI.sln" /property:Configuration=Release, returnStatus: true)
+			bat (msbuild  "C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\MedgrupoAPI.sln" /property:Configuration=Release, returnStatus: true)
 			echo "Build Execution";
 		}
 		stage("Test") {
-			bat ("C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" "C:\Program Files (x86)\Jenkins\jobs\Test_free_git\workspace\Medgrupo.RestfulService.Tests\Ordered\TrocaDevice.orderedtest",
-"C:\Program Files (x86)\Jenkins\jobs\Test_free_git\workspace\Medgrupo.RestfulService.Tests\bin\Release\Medgrupo.RestfulService.Tests.dll", returnStatus: true)
+			bat ("C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\Medgrupo.RestfulService.Tests\\Ordered\\TrocaDevice.orderedtest",
+"C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\Medgrupo.RestfulService.Tests\\bin\\Release\\Medgrupo.RestfulService.Tests.dll", returnStatus: true)
 		}	
 		stage("Backup"){       
-			bat (script: '"powershell" "E:\ScriptsJenkins\Scripts\git_scripts\backup_script.ps1"' , returnStatus: true)
+			bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\backup_script.ps1"' , returnStatus: true)
 		}
 		stage("DLL") {
       String DLLS = "E:\\ScriptsJenkins\\Scripts\\git_scripts\\DLL_separator.ps1";
 			def power = bat (script: 'powershell "'+DLLS+'"', returnStatus: true)
 		}	
 		stage("UploadFTP"){       
-			bat (script: '"powershell" "E:\ScriptsJenkins\Scripts\git_scripts\UPLOAD_FTP.ps1"' , returnStatus: true)
+			bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\UPLOAD_FTP.ps1"' , returnStatus: true)
 		}
 		stage("RunScope"){
 			String url = RUNSCOPE_TRIGGER;
@@ -71,7 +71,7 @@ node {
 		stage("Rollback"){
 			if ("RunScopeOk" != "pass"){
 				echo "Rollback";
-				def powerSRollback1 = bat (script: '"powershell " "E:\ScriptsJenkins\Scripts\git_scripts\rollback.ps1"', returnStatus: true)
+				def powerSRollback1 = bat (script: '"powershell " "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
 				if(powerSRollback1 == 0){
 					echo "ok";
 					emailext attachLog: true, body: 'Feito com sucesso.', subject:"${buildStatus}: Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]", to: EMAIL_TO;
@@ -102,7 +102,7 @@ node {
 		stage("RollbackDepoisDoLoadBalance"){
 			if (RunScopeDepoisDoLoadBalanceOk != "pass"){
 				echo "RollbackDepoisDoLoadBalance";
-				def powerSRollback2 = bat (script: '"powershell " "E:\ScriptsJenkins\Scripts\git_scripts\rollback.ps1"', returnStatus: true)
+				def powerSRollback2 = bat (script: '"powershell " "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
 				if(powerSRollback2 == 0){
 					echo "RollbackDepoisDoLoadBalance ok";
 					emailext attachLog: true, body: 'Feito com sucesso.', subject: "${buildStatus}: Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]", to: EMAIL_TO;
