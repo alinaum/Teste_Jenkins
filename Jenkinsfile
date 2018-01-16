@@ -1,4 +1,8 @@
 #!groovy
+@Grab(group='commons-io', module='commons-io', version='2.5'),
+@Grab('org.codehaus.groovy.modules.http-builder:http-builder:0.7'),
+@Grab('net.sf.json-lib:json-lib:2.3:jdk15')
+
 import groovy.json.JsonOutput
 import java.util.Optional
 import hudson.tasks.test.AbstractTestResultAction
@@ -49,7 +53,7 @@ node {
 			bat (script:'"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\Medgrupo.RestfulService.Tests\\Ordered\\TrocaDevice.orderedtest"')
 			bat (script:'"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\Medgrupo.RestfulService.Tests\\bin\\Release\\Medgrupo.RestfulService.Tests.dll"', returnStatus: true)
 		}	
-		*/
+		
 		stage("Backup"){       
 			bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\backup_script.ps1"' )
 		}
@@ -60,6 +64,8 @@ node {
 		stage("UploadFTP"){       
 			bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\UPLOAD_FTP.ps1"')
 		}
+		*/
+		
 		stage("RunScopeAntes"){
 			String url = RUNSCOPE_TRIGGER;
 			def objRest = ChamaRest(url, RUNSCOPE_TOKEN);
@@ -87,11 +93,11 @@ node {
 				def powerSRollback1 = bat (script: '"powershell " "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
 				if(powerSRollback1 == 0){
 					echo "ok";
-					notifyBuild(currentBuild.result, env.STAGE_NAME)
+					notifyBuild(currentBuild.result, ${env.STAGE_NAME})
 				}else{
 					echo "Erro no Rollback";
 					currentBuild.result = "FAILED"
-					notifyBuild(currentBuild.result, env.STAGE_NAME)
+					notifyBuild(currentBuild.result, ${env.STAGE_NAME})
 					exit;
 				}
 			}
@@ -136,10 +142,10 @@ node {
 				def powerSRollback2 = bat (script: '"powershell " "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
 				if(powerSRollback2 == 0){
 					echo "RollbackDepoisDoLoadBalance ok";
-					notifyBuild(currentBuild.result, env.STAGE_NAME)
+					notifyBuild(currentBuild.result, ${env.STAGE_NAME})
 				}else{
 					currentBuild.result = "FAILED"
-					notifyBuild(currentBuild.result, env.STAGE_NAME)
+					notifyBuild(currentBuild.result, ${env.STAGE_NAME})
 				}
 			}
 			else{
@@ -154,7 +160,7 @@ node {
     throw e
   } finally {
     // Success or failure, always send notifications
-    notifyBuild(currentBuild.result, env.STAGE_NAME)
+    notifyBuild(currentBuild.result, ${env.STAGE_NAME})
   }
 }
  
