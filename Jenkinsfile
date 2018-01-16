@@ -38,8 +38,7 @@ node {
         }
 		
         stage("Build"){
-			def msbuild = tool name: 'MsBuild fw4.0', type: 'hudson.plugins.msbuild.MsBuildInstallation';
-			bat (msbuild  "C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\MedgrupoAPI.sln /property:Configuration=Release", returnStatus: true)
+			bat "(C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\MedgrupoAPI.sln /property:Configuration=Release", returnStatus: true)
 			echo "Build Execution";
 		}
 		stage("Test") {
