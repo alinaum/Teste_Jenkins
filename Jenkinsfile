@@ -201,9 +201,10 @@ def notifyBuild(String buildStatus = 'STARTED', String stageName) {
 
 public def ChamaRest(def url, String token){
     URL object = new  URL(url);
-	echo "entrou chamaRest"
+	
     HttpURLConnection connection = (HttpURLConnection) object
             .openConnection();
+	echo connection
     // int timeOut = connection.getReadTimeout();
     connection.setReadTimeout(60 * 1000);
     connection.setConnectTimeout(60 * 1000);
