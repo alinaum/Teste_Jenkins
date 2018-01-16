@@ -171,11 +171,12 @@ def notifyBuild(String buildStatus = 'STARTED', String stageName) {
   // Default values
   def colorName = 'RED'
   def colorCode = '#FF0000'
-  def subject = "${buildStatus}: Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
+  def subject = "${buildStatus}: ${stageName} "
   def summary = "${subject}: Job rodou usando a (${env.BRANCH_NAME})"
-  def details = """${buildStatus}: Job  ${env.JOB_NAME} Build number: [${env.BUILD_NUMBER}] </p>
-  <p>Branch: ${env.BRANCH_NAME}</p>
-  <p>Check console output at the attachments</p>
+  def details = """${buildStatus}: O Publish falhou no step ${stageName} </p>
+  <p>Branch: Branch utilizada para o publish ${env.BRANCH_NAME}</p>
+  <p>Por favor verifique o log para mais informacoes</p>
+  </br>
  <p><img src="https://itisatechiesworld.files.wordpress.com/2015/01/cool-jenkins2x3.png?w=200"></p>"""
  
   // Override default values based on build status
