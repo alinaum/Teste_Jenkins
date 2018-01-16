@@ -31,6 +31,9 @@ String RUNSCOPE_TRIGGER 	= "https://api.runscope.com/radar/64e1751e-9e93-46ce-a9
 String RUNSCOPE_TESTE     	= "https://api.runscope.com/buckets/wynpst2ckqyc/tests/c5827e2b-2866-406d-9da7-cc9dbadc3055/results/";
 String RUNSCOPE_TOKEN     	= "Bearer 0c4f724e-5125-4886-a657-f26e0f9db627";
 
+String RunScopeOk 							= "";
+String RunScopeDepoisDoLoadBalanceOk 		= "";
+
 node {
     try {
         stage('Checkout') {
@@ -64,8 +67,6 @@ node {
 			{
 			RunScopeOk = ChamaRestTeste(idTrigger, RUNSCOPE_TESTE, RUNSCOPE_TOKEN);
 			}
-			//adiconar, stage step
-		
 		}	    
 		stage("Rollback"){
 			if ("RunScopeOk" != "pass"){
@@ -135,7 +136,8 @@ def notifyBuild(String buildStatus = 'STARTED') {
   def summary = "${subject}: Job rodou usando a (${env.BRANCH_NAME})"
   def details = """<p>STARTED: Job  ${env.JOB_NAME} Build number: [${env.BUILD_NUMBER}] </p>
   <p>Branch: ${env.BRANCH_NAME}</p>
-  <p>Check console output at the attachments</p>"""
+  <p>Check console output at the attachments</p>
+ <p><img src="https://itisatechiesworld.files.wordpress.com/2015/01/cool-jenkins2x3.png?w=538"></p>"""
  
   // Override default values based on build status
   if (buildStatus == 'STARTED') {
