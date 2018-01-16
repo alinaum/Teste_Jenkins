@@ -212,7 +212,7 @@ public def ChamaRest(def url, String token){
     connection.setRequestProperty("Authorization", token);
     int responseCode = connection.getResponseCode();
     //String responseMsg = connection.getResponseMessage();
-
+	println(responseCode);
     if (responseCode == 200 || responseCode == 201) {
         InputStream inputStr = connection.getInputStream();
         
