@@ -58,7 +58,7 @@ node {
 		stage("UploadFTP"){       
 			bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\UPLOAD_FTP.ps1"' , returnStatus: true)
 		}
-		stage("RunScope"){
+		stage("RunScopeAntes"){
 			String url = RUNSCOPE_TRIGGER;
 			def objRest = ChamaRest(url, RUNSCOPE_TOKEN);
 			String idTrigger = objRest.data.runs.test_run_id[0].toString();
@@ -67,17 +67,37 @@ node {
 			{
 			RunScopeOk = ChamaRestTeste(idTrigger, RUNSCOPE_TESTE, RUNSCOPE_TOKEN);
 			}
-		}	    
+			
+			if(RunScopeOk == "pass"){
+				echo "ok";
+			}
+			else
+			{
+				echo "Erro no RunScope";
+				exit;
+			}
+		}
+		
+		stage("E-mail RunScope"){
+			if(RunScopeOk == "pass"){
+				notifyBuild(currentBuild.result, RunScopeAntes)
+			}
+			else{
+				currentBuild.result = "FAILED"
+				notifyBuild(currentBuild.result, RunScopeAntes)
+			}
+		}
 		stage("Rollback"){
 			if ("RunScopeOk" != "pass"){
 				echo "Rollback";
 				def powerSRollback1 = bat (script: '"powershell " "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
 				if(powerSRollback1 == 0){
 					echo "ok";
-					emailext attachLog: true, body: 'Feito com sucesso.', subject:"${buildStatus}: Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]", to: EMAIL_TO;
+					notifyBuild(currentBuild.result, env.STAGE_NAME)
 				}else{
 					echo "Erro no Rollback";
-					emailext attachLog: true, body:"Build Failure! please see the log for more details. ", subject: "${buildStatus}: Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]", to: EMAIL_TO;
+					currentBuild.result = "FAILED"
+					notifyBuild(currentBuild.result, env.STAGE_NAME)
 					exit;
 				}
 			}
@@ -97,17 +117,35 @@ node {
 			RunScopeDepoisDoLoadBalanceOk = ChamaRestTeste(idTrigger, RUNSCOPE_TESTE, RUNSCOPE_TOKEN);
 			}
 			
-	
-		}	
+			if(RunScopeDepoisDoLoadBalanceOk == "pass"){
+				echo "RunScope ok";
+			}
+			else
+			{
+				echo "Erro no RunScope";
+				exit;
+			}
+		}
+		
+		stage("E-mail RunScope depois do LoadBalance Homologação"){
+			if(RunScopeDepoisDoLoadBalanceOk == "pass"){
+				notifyBuild(currentBuild.result, RunScopeDepoisDoLoadBalance)
+			}
+			else{
+				currentBuild.result = "FAILED"
+				notifyBuild(currentBuild.result, RunScopeDepoisDoLoadBalance)
+			}
+		}
 		stage("RollbackDepoisDoLoadBalance"){
 			if (RunScopeDepoisDoLoadBalanceOk != "pass"){
 				echo "RollbackDepoisDoLoadBalance";
 				def powerSRollback2 = bat (script: '"powershell " "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
 				if(powerSRollback2 == 0){
 					echo "RollbackDepoisDoLoadBalance ok";
-					emailext attachLog: true, body: 'Feito com sucesso.', subject: "${buildStatus}: Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]", to: EMAIL_TO;
+					notifyBuild(currentBuild.result, env.STAGE_NAME)
 				}else{
-					emailext attachLog: true, body:"Build Failure! please see the log for more details.", subject: "${buildStatus}: Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]", to: EMAIL_TO; 
+					currentBuild.result = "FAILED"
+					notifyBuild(currentBuild.result, env.STAGE_NAME)
 				}
 			}
 			else{
@@ -115,17 +153,18 @@ node {
 			}
 		}
 
+
   } catch (e) {
     // If there was an exception thrown, the build failed
     currentBuild.result = "FAILED"
     throw e
   } finally {
     // Success or failure, always send notifications
-    notifyBuild(currentBuild.result)
+    notifyBuild(currentBuild.result, env.STAGE_NAME)
   }
 }
  
-def notifyBuild(String buildStatus = 'STARTED') {
+def notifyBuild(String buildStatus = 'STARTED', String stageName) {
   // build status of null means successful
   buildStatus =  buildStatus ?: 'SUCCESSFUL'
  
@@ -134,10 +173,10 @@ def notifyBuild(String buildStatus = 'STARTED') {
   def colorCode = '#FF0000'
   def subject = "${buildStatus}: Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
   def summary = "${subject}: Job rodou usando a (${env.BRANCH_NAME})"
-  def details = """<p>STARTED: Job  ${env.JOB_NAME} Build number: [${env.BUILD_NUMBER}] </p>
+  def details = """${buildStatus}: Job  ${env.JOB_NAME} Build number: [${env.BUILD_NUMBER}] </p>
   <p>Branch: ${env.BRANCH_NAME}</p>
   <p>Check console output at the attachments</p>
- <p><img src="https://itisatechiesworld.files.wordpress.com/2015/01/cool-jenkins2x3.png?w=538"></p>"""
+ <p><img src="https://itisatechiesworld.files.wordpress.com/2015/01/cool-jenkins2x3.png?w=200"></p>"""
  
   // Override default values based on build status
   if (buildStatus == 'STARTED') {
