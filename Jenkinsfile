@@ -38,11 +38,11 @@ node {
         }
 		
         stage("Build"){
-			bat ('"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\MedgrupoAPI.sln" /property:Configuration=Release', returnStatus: true)
+			bat (script:'"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\MedgrupoAPI.sln" /property:Configuration=Release', returnStatus: true)
 			echo "Build Execution";
 		}
 		stage("Test") {
-			bat ('"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\Medgrupo.RestfulService.Tests\\Ordered\\TrocaDevice.orderedtest,C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\Medgrupo.RestfulService.Tests\\bin\\Release\\Medgrupo.RestfulService.Tests.dll"', returnStatus: true)
+			bat (script:'"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\Medgrupo.RestfulService.Tests\\Ordered\\TrocaDevice.orderedtest,C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\Medgrupo.RestfulService.Tests\\bin\\Release\\Medgrupo.RestfulService.Tests.dll"', returnStatus: true)
 		}	
 		stage("Backup"){       
 			bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\backup_script.ps1"' , returnStatus: true)
