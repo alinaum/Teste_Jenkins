@@ -188,7 +188,7 @@ def notifyBuild(String buildStatus = 'STARTED', String stageName) {
   }
  
   // Send notifications
-  slackSend (color: colorCode, message: summary, attachLog: true)
+  slackSend (color: colorCode, message: summary)
     //email
   emailext (
 	  mimeType: 'text/html',
@@ -225,13 +225,12 @@ public def ChamaRest(def url, String token){
 		//println(obj.data.result);
 		return obj;
 		}
-	} catch (e) {
+	} catch (Exception e) {
     // If there was an exception thrown, the build failed
-    currentBuild.result = "FAILED"
-    throw e
+		currentBuild.result = "FAILED"
   } finally {
     // Success or failure, always send notifications
-    println (e);
+    println (e.getMessage());
   }
 }
 
