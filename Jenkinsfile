@@ -231,7 +231,7 @@ public def ChamaRest(def url, String token){
 		println (e.getMessage());
   } finally {
     // Success or failure, always send notifications
-    println ("sei la")
+    println ("agora la")
   }
 }
 
