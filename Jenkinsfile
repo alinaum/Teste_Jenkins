@@ -228,9 +228,10 @@ public def ChamaRest(def url, String token){
 	} catch (Exception e) {
     // If there was an exception thrown, the build failed
 		currentBuild.result = "FAILED"
+		println (e.getMessage());
   } finally {
     // Success or failure, always send notifications
-    println (e.getMessage());
+    println ("sei la")
   }
 }
 
