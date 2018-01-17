@@ -27,9 +27,9 @@ import java.io.FileInputStream;
 import java.io.*;
 
 
-String RUNSCOPE_TRIGGER 	= "https://api.runscope.com/radar/64e1751e-9e93-46ce-a9fc-156f9c7f4490/trigger";
-String RUNSCOPE_TESTE     	= "https://api.runscope.com/buckets/wynpst2ckqyc/tests/c5827e2b-2866-406d-9da7-cc9dbadc3055/results/";
-String RUNSCOPE_TOKEN     	= "Bearer 0c4f724e-5125-4886-a657-f26e0f9db627";
+String RUNSCOPE_TRIGGER 	= "https://api.runscope.com/radar/64e1751e-9e93-46ce-a9fc-156f9c7f4490/trigger" ;
+String RUNSCOPE_TESTE     	= "https://api.runscope.com/buckets/wynpst2ckqyc/tests/c5827e2b-2866-406d-9da7-cc9dbadc3055/results/" ;
+String RUNSCOPE_TOKEN     	= "Bearer 0c4f724e-5125-4886-a657-f26e0f9db627" ;
 
 String RunScopeOk 							= "";
 String RunScopeDepoisDoLoadBalanceOk 		= "";
