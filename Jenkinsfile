@@ -231,7 +231,7 @@ public def ChamaRest(def url, String token){
     throw e
   } finally {
     // Success or failure, always send notifications
-    notifyBuild(currentBuild.result, env.STAGE_NAME)
+    println (e);
   }
 }
 
