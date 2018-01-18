@@ -64,11 +64,11 @@ node {
 		
 		stage("E-mail RunScope"){
 			if(RunScopeOk == 0){
-				notifyBuild(currentBuild.result, RunScopeAntes)
+				notifyBuild(currentBuild.result, "RunScopeAntes")
 			}
 			else{
 				currentBuild.result = "FAILED"
-				notifyBuild(currentBuild.result, RunScopeAntes)
+				notifyBuild(currentBuild.result, "RunScopeAntes")
 			}
 		}
 		stage("Rollback"){
@@ -77,11 +77,11 @@ node {
 				def powerSRollback1 = bat (script: '"powershell " "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
 				if(powerSRollback1 == 0){
 					echo "ok";
-					notifyBuild(currentBuild.result, env.STAGE_NAME)
+					notifyBuild(currentBuild.result, ${STAGE_NAME})
 				}else{
 					echo "Erro no Rollback";
 					currentBuild.result = "FAILED"
-					notifyBuild(currentBuild.result, env.STAGE_NAME)
+					notifyBuild(currentBuild.result, ${STAGE_NAME})
 					exit;
 				}
 			}
@@ -97,11 +97,11 @@ node {
 		
 		stage("E-mail RunScope depois do LoadBalance Homologação"){
 			if(RunScopeDepoisDoLoadBalanceOk == 0){
-				notifyBuild(currentBuild.result, RunScopeDepoisDoLoadBalance)
+				notifyBuild(currentBuild.result, "RunScopeDepoisDoLoadBalance")
 			}
 			else{
 				currentBuild.result = "FAILED"
-				notifyBuild(currentBuild.result, RunScopeDepoisDoLoadBalance)
+				notifyBuild(currentBuild.result, "RunScopeDepoisDoLoadBalance")
 			}
 		}
 		stage("RollbackDepoisDoLoadBalance"){
@@ -127,7 +127,7 @@ node {
     throw e
   } finally {
     // Success or failure, always send notifications
-    notifyBuild(currentBuild.result, env.STAGE_NAME)
+    notifyBuild(currentBuild.result, ${STAGE_NAME})
   }
 }
  
