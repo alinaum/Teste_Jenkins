@@ -92,7 +92,7 @@ node {
 	
 		stage("RunScopeDepoisDoLoadBalance"){
 			sleep time: 6, unit: 'MINUTES';
-			def RunScopeDepoisDoLoadBalanceOk = bat (script: "C:\\Python27\\python.exe " "C:\Users\acampos\Desktop\runscope_python.py", returnStatus: true)
+			def RunScopeDepoisDoLoadBalanceOk = bat (script: '"powershell " "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
 		}
 		
 		stage("E-mail RunScope depois do LoadBalance Homologação"){
