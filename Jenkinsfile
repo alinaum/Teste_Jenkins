@@ -59,7 +59,7 @@ node {
 		
 		stage("RunScopeAntes"){
 
-			def RunScopeOk = bat (script: "C:\Python27\python.exe" "E:\ScriptsJenkins\Scripts\git_scripts\runscope_python.py", returnStatus: true)
+			def RunScopeOk = bat (script: "C:\\Python27\\python.exe" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\runscope_python.py", returnStatus: true)
 		}
 		
 		stage("E-mail RunScope"){
