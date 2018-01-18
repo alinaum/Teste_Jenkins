@@ -54,7 +54,7 @@ node {
 			}
 			else{
 				currentBuild.result = "FAILED"
-				RegexTest = "<P>${BUILD_LOG_REGEX, regex="^Failed*",showTruncatedLines = false, maxMatches = 1,  linesAfter= 2}</P>"
+				RegexTest = egexTest = ${BUILD_LOG_REGEX, regex="^Failed*",showTruncatedLines = false, maxMatches = 1,  linesAfter= 2}
 				notifyBuild(currentBuild.result, stageName)	
 				exit ;
 			}
@@ -63,7 +63,7 @@ node {
 			}
 			else{
 				currentBuild.result = "FAILED"
-				RegexTest = "<P>${BUILD_LOG_REGEX, regex="^Failed*",showTruncatedLines = false, maxMatches = 1,  linesAfter= 2}</P>"
+				RegexTest = ${BUILD_LOG_REGEX, regex="^Failed*",showTruncatedLines = false, maxMatches = 1,  linesAfter= 2}
 				notifyBuild(currentBuild.result, stageName)				
 			}
 			
@@ -164,7 +164,7 @@ def notifyBuild(String buildStatus = 'STARTED', String stageName) {
   <p>Branch: Branch utilizada para o publish ${env.BRANCH_NAME}</p>
   <p>Por favor verifique o log para mais informacoes</p>
   <hr>
-  ${RegexTest}
+  <p>${RegexTest}<p>
   </br>
  <p><img src="https://itisatechiesworld.files.wordpress.com/2015/01/cool-jenkins2x3.png?w=200"></p>"""
  
