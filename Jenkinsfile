@@ -28,40 +28,64 @@ import java.io.*;
 
 int RunScopeOk = 0;
 int RunScopeDepoisDoLoadBalanceOk = 0;
+int Test1 = 0;
+int Test2 = 0;
+String stageName = "";
+String RegexTest = "";
 node {
     try {
-		/*
+
         stage('Checkout') {
             checkout scm
+			stageName = "Checkout"
         }
 		
-        stage("Build"){
+        stage("MSBUILD"){
 			bat (script:'"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\MedgrupoAPI.sln" /property:Configuration=Release')
 			echo "Build Execution";
+			stageName = "MSBUILD"
 		}
 		stage("Test") {
-			bat (script:'"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\Medgrupo.RestfulService.Tests\\Ordered\\TrocaDevice.orderedtest"')
-			bat (script:'"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\Medgrupo.RestfulService.Tests\\bin\\Release\\Medgrupo.RestfulService.Tests.dll"', returnStatus: true)
+			stageName = "Test Unitario"
+			Test1 = bat (script:'"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\Medgrupo.RestfulService.Tests\\Ordered\\TrocaDevice.orderedtest"')			
+			
+			if(Test1 == 0){
+				Test2 = bat (script:'"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Test_free_git\\workspace\\Medgrupo.RestfulService.Tests\\bin\\Release\\Medgrupo.RestfulService.Tests.dll"', returnStatus: true)
+			}
+			else{
+				currentBuild.result = "FAILED"
+				RegexTest = "<P>${BUILD_LOG_REGEX, regex="^Failed*",showTruncatedLines = false, maxMatches = 1,  linesAfter= 2}</P>"
+				notifyBuild(currentBuild.result, stageName)	
+				exit ;
+			}
+			if(Test1 == 0 & Test2 == 0){
+				echo " Test unitario ok"
+			}
+			else{
+				currentBuild.result = "FAILED"
+				RegexTest = "<P>${BUILD_LOG_REGEX, regex="^Failed*",showTruncatedLines = false, maxMatches = 1,  linesAfter= 2}</P>"
+				notifyBuild(currentBuild.result, stageName)				
+			}
+			
 		}	
 		
 		stage("Backup"){       
 			bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\backup_script.ps1"' )
+			stageName = "Backup"
 		}
 		stage("DLL") {
 			String DLLS = "E:\\ScriptsJenkins\\Scripts\\git_scripts\\DLL_separator.ps1";
 			bat (script: 'powershell "'+DLLS+'"')
+			stageName = "Preparar Publish"
 		}	
 		stage("UploadFTP"){       
 			bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\UPLOAD_FTP.ps1"')
+			stageName = "UploadFTP"
 		}
-		*/
 		
 		stage("RunScopeAntes"){
 
 			RunScopeOk = bat (script: '"C:\\Python27\\python.exe" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\runscope_python.py"', returnStatus: true)
-		}
-		
-		stage("E-mail RunScope"){
 			if(RunScopeOk == 0){
 				notifyBuild(currentBuild.result, "RunScope Antes")
 			}
@@ -70,6 +94,7 @@ node {
 				notifyBuild(currentBuild.result, "RunScope Antes")
 			}
 		}
+		
 		stage("Rollback"){
 			if (RunScopeOk != 0){
 				echo "Rollback";
@@ -92,9 +117,6 @@ node {
 		stage("RunScopeDepoisDoLoadBalance"){
 			sleep time: 6, unit: 'MINUTES';
 			RunScopeDepoisDoLoadBalanceOk = bat (script: '"C:\\Python27\\python.exe" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\runscope_python.py"', returnStatus: true)
-		}
-		
-		stage("E-mail RunScope depois do LoadBalance Homologação"){
 			if(RunScopeDepoisDoLoadBalanceOk == 0){
 				notifyBuild(currentBuild.result, "RunScope Depois Do LoadBalance")
 			}
@@ -103,6 +125,7 @@ node {
 				notifyBuild(currentBuild.result, "RunScope Depois Do LoadBalance")
 			}
 		}
+		
 		stage("RollbackDepoisDoLoadBalance"){
 			if (RunScopeDepoisDoLoadBalanceOk != 0){
 				echo "RollbackDepoisDoLoadBalance";
@@ -123,6 +146,7 @@ node {
   } catch (e) {
     // If there was an exception thrown, the build failed
     currentBuild.result = "FAILED"
+	notifyBuild(currentBuild.result,stageName )
     throw e
   } 
 }
@@ -139,6 +163,8 @@ def notifyBuild(String buildStatus = 'STARTED', String stageName) {
   def details = """<p>${stageName}: ${buildStatus}</p>
   <p>Branch: Branch utilizada para o publish ${env.BRANCH_NAME}</p>
   <p>Por favor verifique o log para mais informacoes</p>
+  <hr>
+  ${RegexTest}
   </br>
  <p><img src="https://itisatechiesworld.files.wordpress.com/2015/01/cool-jenkins2x3.png?w=200"></p>"""
  
