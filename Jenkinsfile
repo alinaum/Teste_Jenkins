@@ -26,8 +26,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.*;
 
-String RunScopeOk 							= "";
-String RunScopeDepoisDoLoadBalanceOk 		= "";
+def RunScopeOk 							= "";
+def RunScopeDepoisDoLoadBalanceOk 		= "";
 
 node {
     try {
@@ -59,7 +59,7 @@ node {
 		
 		stage("RunScopeAntes"){
 
-			def RunScopeOk = bat (script: '"C:\\Python27\\python.exe" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\runscope_python.py"', returnStatus: true)
+			RunScopeOk = bat (script: '"C:\\Python27\\python.exe" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\runscope_python.py"', returnStatus: true)
 		}
 		
 		stage("E-mail RunScope"){
@@ -92,7 +92,7 @@ node {
 	
 		stage("RunScopeDepoisDoLoadBalance"){
 			sleep time: 6, unit: 'MINUTES';
-			def RunScopeDepoisDoLoadBalanceOk = bat (script: '"powershell " "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
+			RunScopeDepoisDoLoadBalanceOk = bat (script: '"powershell " "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
 		}
 		
 		stage("E-mail RunScope depois do LoadBalance Homologação"){
