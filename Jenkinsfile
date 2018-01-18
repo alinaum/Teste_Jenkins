@@ -73,7 +73,7 @@ node {
 		stage("Rollback"){
 			if (RunScopeOk != 0){
 				echo "Rollback";
-				def powerSRollback1 = bat (script: '"powershell " "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
+				def powerSRollback1 = bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
 				if(powerSRollback1 == 0){
 					echo "ok";
 					notifyBuild(currentBuild.result, "Rollback" )
@@ -91,7 +91,7 @@ node {
 	
 		stage("RunScopeDepoisDoLoadBalance"){
 			sleep time: 6, unit: 'MINUTES';
-			RunScopeDepoisDoLoadBalanceOk = bat (script: '"powershell " "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
+			RunScopeDepoisDoLoadBalanceOk = bat (script: '"C:\\Python27\\python.exe" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\runscope_python.py"', returnStatus: true)
 		}
 		
 		stage("E-mail RunScope depois do LoadBalance Homologação"){
@@ -106,7 +106,7 @@ node {
 		stage("RollbackDepoisDoLoadBalance"){
 			if (RunScopeDepoisDoLoadBalanceOk != 0){
 				echo "RollbackDepoisDoLoadBalance";
-				def powerSRollback2 = bat (script: '"powershell " "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
+				def powerSRollback2 = bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
 				if(powerSRollback2 == 0){
 					echo "RollbackDepoisDoLoadBalance ok";
 					notifyBuild(currentBuild.result, "Rollback Depois Do LoadBalance")
