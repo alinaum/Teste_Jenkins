@@ -28,7 +28,6 @@ import java.io.*;
 
 int RunScopeOk = 0;
 int RunScopeDepoisDoLoadBalanceOk = 0;
-int returBuild = 0;
 int returOrder = 0;
 int returUnit = 0;
 int returBack = 0;
@@ -45,16 +44,8 @@ node {
 	
     stage("MSBUILD"){
 		stageName = "MSBUILD"
-		returBuild = bat (script:'"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Release-Branch\\workspace\\MedgrupoAPI.sln" /property:Configuration=Release')	
-		if(returBuild != 0){
-			currentBuild.result = "FAILED"
-			notifyBuild(currentBuild.result, "Build")
-			error 'Build Error'
-		}
-		else{
-			echo "Msbuild"
-		}
-		
+		bat (script:'"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Release-Branch\\workspace\\MedgrupoAPI.sln" /property:Configuration=Release')	
+			
 	}
 	stage("Test") {
 		stageName = "Testes"
