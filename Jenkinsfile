@@ -62,11 +62,11 @@ node {
 		
 		stage("E-mail RunScope"){
 			if(RunScopeOk == 0){
-				notifyBuild(currentBuild.result, "RunScopeAntes")
+				notifyBuild(currentBuild.result, "RunScope Antes")
 			}
 			else{
 				currentBuild.result = "FAILED"
-				notifyBuild(currentBuild.result, "RunScopeAntes")
+				notifyBuild(currentBuild.result, "RunScope Antes")
 			}
 		}
 		stage("Rollback"){
@@ -75,11 +75,11 @@ node {
 				def powerSRollback1 = bat (script: '"powershell " "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
 				if(powerSRollback1 == 0){
 					echo "ok";
-					notifyBuild(currentBuild.result, ${STAGE_NAME})
+					notifyBuild(currentBuild.result, "Rollback" )
 				}else{
 					echo "Erro no Rollback";
 					currentBuild.result = "FAILED"
-					notifyBuild(currentBuild.result, ${STAGE_NAME})
+					notifyBuild(currentBuild.result, "Rollback" )
 					exit;
 				}
 			}
@@ -95,11 +95,11 @@ node {
 		
 		stage("E-mail RunScope depois do LoadBalance Homologação"){
 			if(RunScopeDepoisDoLoadBalanceOk == 0){
-				notifyBuild(currentBuild.result, "RunScopeDepoisDoLoadBalance")
+				notifyBuild(currentBuild.result, "RunScope Depois Do LoadBalance")
 			}
 			else{
 				currentBuild.result = "FAILED"
-				notifyBuild(currentBuild.result, "RunScopeDepoisDoLoadBalance")
+				notifyBuild(currentBuild.result, "RunScope Depois Do LoadBalance")
 			}
 		}
 		stage("RollbackDepoisDoLoadBalance"){
@@ -108,10 +108,10 @@ node {
 				def powerSRollback2 = bat (script: '"powershell " "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
 				if(powerSRollback2 == 0){
 					echo "RollbackDepoisDoLoadBalance ok";
-					notifyBuild(currentBuild.result, env.STAGE_NAME)
+					notifyBuild(currentBuild.result, "Rollback Depois Do LoadBalance")
 				}else{
 					currentBuild.result = "FAILED"
-					notifyBuild(currentBuild.result, env.STAGE_NAME)
+					notifyBuild(currentBuild.result, "Rollback Depois Do LoadBalance")
 				}
 			}
 			else{
@@ -125,7 +125,7 @@ node {
     throw e
   } finally {
     // Success or failure, always send notifications
-    notifyBuild(currentBuild.result, ${STAGE_NAME})
+    notifyBuild(currentBuild.result, "${env.STAGE_NAME}")
   }
 }
  
@@ -138,7 +138,7 @@ def notifyBuild(String buildStatus = 'STARTED', String stageName) {
   def colorCode = '#FF0000'
   def subject = "${buildStatus}: ${stageName} "
   def summary = "${subject}: Job rodou usando a (${env.BRANCH_NAME})"
-  def details = """${buildStatus}: O Publish falhou no step ${stageName} </p>
+  def details = """${buildStatus}: Ultima faze do build a rodar ${stageName} </p>
   <p>Branch: Branch utilizada para o publish ${env.BRANCH_NAME}</p>
   <p>Por favor verifique o log para mais informacoes</p>
   </br>
