@@ -31,7 +31,7 @@ int RunScopeDepoisDoLoadBalanceOk = 0;
 int Test1 = 0;
 int Test2 = 0;
 String stageName = "";
-String RegexTest = "";
+
 node {
     try {
 
@@ -54,7 +54,6 @@ node {
 			}
 			else{
 				currentBuild.result = "FAILED"
-				RegexTest = ${BUILD_LOG_REGEX, regex="^Failed*",showTruncatedLines = false, maxMatches = 1,  linesAfter= 2}
 				notifyBuild(currentBuild.result, stageName)	
 				exit ;
 			}
@@ -63,7 +62,6 @@ node {
 			}
 			else{
 				currentBuild.result = "FAILED"
-				RegexTest = ${BUILD_LOG_REGEX, regex="^Failed*",showTruncatedLines = false, maxMatches = 1,  linesAfter= 2}
 				notifyBuild(currentBuild.result, stageName)				
 			}
 			
@@ -164,9 +162,8 @@ def notifyBuild(String buildStatus = 'STARTED', String stageName) {
   <p>Branch: Branch utilizada para o publish ${env.BRANCH_NAME}</p>
   <p>Por favor verifique o log para mais informacoes</p>
   <hr>
-  <p>${RegexTest}<p>
   </br>
- <p><img src="https://itisatechiesworld.files.wordpress.com/2015/01/cool-jenkins2x3.png?w=200"></p>"""
+ """
  
   // Override default values based on build status
   if (buildStatus == 'STARTED') {
@@ -187,7 +184,9 @@ def notifyBuild(String buildStatus = 'STARTED', String stageName) {
 	  mimeType: 'text/html',
 	  attachLog: true,
       subject: subject,
-      body: details,
+      body: details '''"<p>${BUILD_LOG_REGEX, regex="^Failed*",showTruncatedLines = false, maxMatches = 1,  linesAfter= 2}</p>
+	  <hr>
+	  <p><img src="https://itisatechiesworld.files.wordpress.com/2015/01/cool-jenkins2x3.png?w=200"></p>"''',
       to: "aline.campos@ventron.com.br"
     ) 
 }
