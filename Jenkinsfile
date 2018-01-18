@@ -63,19 +63,12 @@ node {
 		*/
 		
 		stage("RunScopeAntes"){
-			String url = RUNSCOPE_TRIGGER;
-			def objRest = ChamaRest(url, RUNSCOPE_TOKEN);
-			String idTrigger = objRest.data.runs.test_run_id[0].toString();
-			RunScopeOk = ChamaRestTeste(idTrigger, RUNSCOPE_TESTE, RUNSCOPE_TOKEN);
-			while(RunScopeOk != "pass" && RunScopeOk != "fail")
-			{
-			RunScopeOk = ChamaRestTeste(idTrigger, RUNSCOPE_TESTE, RUNSCOPE_TOKEN);
-			}
 
+			def RunScopeOk = bat (script: "C:\Python27\python.exe" "E:\ScriptsJenkins\Scripts\git_scripts\runscope_python.py", returnStatus: true)
 		}
 		
 		stage("E-mail RunScope"){
-			if(RunScopeOk == "pass"){
+			if(RunScopeOk == 0){
 				notifyBuild(currentBuild.result, RunScopeAntes)
 			}
 			else{
@@ -84,7 +77,7 @@ node {
 			}
 		}
 		stage("Rollback"){
-			if ("RunScopeOk" != "pass"){
+			if ("RunScopeOk" != 0){
 				echo "Rollback";
 				def powerSRollback1 = bat (script: '"powershell " "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
 				if(powerSRollback1 == 0){
@@ -104,27 +97,11 @@ node {
 	
 		stage("RunScopeDepoisDoLoadBalance"){
 			sleep time: 6, unit: 'MINUTES';
-			String url = RUNSCOPE_TRIGGER;
-			def objRest = ChamaRest(url, RUNSCOPE_TOKEN);
-			String idTrigger = objRest.data.runs.test_run_id[0].toString();
-			RunScopeDepoisDoLoadBalanceOk = ChamaRestTeste(idTrigger, RUNSCOPE_TESTE, RUNSCOPE_TOKEN);
-			while(RunScopeDepoisDoLoadBalanceOk != "pass" && RunScopeDepoisDoLoadBalanceOk != "fail")
-			{
-			RunScopeDepoisDoLoadBalanceOk = ChamaRestTeste(idTrigger, RUNSCOPE_TESTE, RUNSCOPE_TOKEN);
-			}
-			
-			if(RunScopeDepoisDoLoadBalanceOk == "pass"){
-				echo "RunScope ok";
-			}
-			else
-			{
-				echo "Erro no RunScope";
-				exit;
-			}
+			def RunScopeDepoisDoLoadBalanceOk = bat (script: "C:\\Python27\\python.exe " "C:\Users\acampos\Desktop\runscope_python.py", returnStatus: true)
 		}
 		
 		stage("E-mail RunScope depois do LoadBalance Homologação"){
-			if(RunScopeDepoisDoLoadBalanceOk == "pass"){
+			if(RunScopeDepoisDoLoadBalanceOk == 0)
 				notifyBuild(currentBuild.result, RunScopeDepoisDoLoadBalance)
 			}
 			else{
@@ -133,7 +110,7 @@ node {
 			}
 		}
 		stage("RollbackDepoisDoLoadBalance"){
-			if (RunScopeDepoisDoLoadBalanceOk != "pass"){
+			if (RunScopeDepoisDoLoadBalanceOk != 0){
 				echo "RollbackDepoisDoLoadBalance";
 				def powerSRollback2 = bat (script: '"powershell " "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
 				if(powerSRollback2 == 0){
@@ -196,67 +173,4 @@ def notifyBuild(String buildStatus = 'STARTED', String stageName) {
       body: details,
       to: "aline.campos@ventron.com.br"
     ) 
-}
-
-public def ChamaRest(def url, String token){
-	try {
-		URL object = new  URL(url);
-	
-		HttpURLConnection connection = (HttpURLConnection) object
-				.openConnection();
-		// int timeOut = connection.getReadTimeout();
-		connection.setReadTimeout(60 * 1000);
-		//connection.setConnectTimeout(60 * 1000);
-	
-		connection.setRequestProperty("Authorization", token);
-		int responseCode = connection.getResponseCode();
-		//String responseMsg = connection.getResponseMessage();
-	
-		if (responseCode == 200 || responseCode == 201) {
-			InputStream inputStr = connection.getInputStream();
-			
-			String encoding = connection.getContentEncoding() == null ? "UTF-8"
-					: connection.getContentEncoding();
-			jsonResponse = IOUtils.toString(inputStr, encoding);
-			
-		def jsonSlurper = new JsonSlurper()
-		def obj = jsonSlurper.parseText(jsonResponse) 
-		//println(obj.data.result);
-		return obj;
-		}
-	} catch (Exception e) {
-    // If there was an exception thrown, the build failed
-		currentBuild.result = "FAILED"
-		println (e.getMessage());
-  } finally {
-    // Success or failure, always send notifications
-    println ("agora la")
-  }
-}
-
-public String ChamaRestTeste(def teste, String urlTeste, String token){
-    URL object = new  URL(urlTeste+ teste);
-
-    HttpURLConnection connection = (HttpURLConnection) object
-            .openConnection();
-    // int timeOut = connection.getReadTimeout();
-    connection.setReadTimeout(60 * 1000);
-    connection.setConnectTimeout(60 * 1000);
-
-    connection.setRequestProperty("Authorization", token);
-    int responseCode = connection.getResponseCode();
-    //String responseMsg = connection.getResponseMessage();
-
-    if (responseCode == 200) {
-        InputStream inputStr = connection.getInputStream();
-        
-        String encoding = connection.getContentEncoding() == null ? "UTF-8"
-                : connection.getContentEncoding();
-        jsonResponse = IOUtils.toString(inputStr, encoding);
-        
-      def jsonSlurper = new JsonSlurper()
-      def obj = jsonSlurper.parseText(jsonResponse) 
-      //println(obj.data.result);
-      return obj.data.result;
-    }
 }
