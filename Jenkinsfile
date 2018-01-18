@@ -96,7 +96,7 @@ node {
 		}
 		
 		stage("E-mail RunScope depois do LoadBalance Homologação"){
-			if(RunScopeDepoisDoLoadBalanceOk == 0)
+			if(RunScopeDepoisDoLoadBalanceOk == 0){
 				notifyBuild(currentBuild.result, RunScopeDepoisDoLoadBalance)
 			}
 			else{
