@@ -124,10 +124,7 @@ node {
     // If there was an exception thrown, the build failed
     currentBuild.result = "FAILED"
     throw e
-  } finally {
-    // Success or failure, always send notifications
-    notifyBuild(currentBuild.result, "${env.STAGE_NAME}")
-  }
+  } 
 }
  
 def notifyBuild(String buildStatus = 'STARTED', String stageName) {
@@ -139,7 +136,7 @@ def notifyBuild(String buildStatus = 'STARTED', String stageName) {
   def colorCode = '#FF0000'
   def subject = "${buildStatus}: ${stageName} "
   def summary = "${subject}: Job rodou usando a (${env.BRANCH_NAME})"
-  def details = """${buildStatus}: Ultima faze do build a rodar ${stageName} </p>
+  def details = """<p>${stageName}: ${buildStatus}</p>
   <p>Branch: Branch utilizada para o publish ${env.BRANCH_NAME}</p>
   <p>Por favor verifique o log para mais informacoes</p>
   </br>
