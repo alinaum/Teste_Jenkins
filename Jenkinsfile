@@ -28,8 +28,6 @@ import java.io.*;
 
 int RunScopeOk = 0;
 int RunScopeDepoisDoLoadBalanceOk = 0;
-int Test1 = 0;
-int Test2 = 0;
 String stageName = "";
 
 node {
@@ -47,23 +45,8 @@ node {
 		}
 		stage("Test") {
 			stageName = "Test Unitario"
-			Test1 = bat (script:'"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Release-Branch\\workspace\\Medgrupo.RestfulService.Tests\\Ordered\\TrocaDevice.orderedtest"')			
-			
-			if(Test1 == 0){
-				Test2 = bat (script:'"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Release-Branch\\workspace\\Medgrupo.RestfulService.Tests\\bin\\Release\\Medgrupo.RestfulService.Tests.dll"', returnStatus: true)
-			}
-			else{
-				currentBuild.result = "FAILED"
-				notifyBuild(currentBuild.result, stageName)	
-				exit ;
-			}
-			if(Test1 == 0 & Test2 == 0){
-				echo " Test unitario ok"
-			}
-			else{
-				currentBuild.result = "FAILED"
-				notifyBuild(currentBuild.result, stageName)				
-			}
+			bat (script:'"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Release-Branch\\workspace\\Medgrupo.RestfulService.Tests\\Ordered\\TrocaDevice.orderedtest"')						
+			bat (script:'"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Release-Branch\\workspace\\Medgrupo.RestfulService.Tests\\bin\\Release\\Medgrupo.RestfulService.Tests.dll"', returnStatus: true)
 			
 		}	
 		
