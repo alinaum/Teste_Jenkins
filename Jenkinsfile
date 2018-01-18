@@ -54,7 +54,7 @@ node {
 			}
 			else{
 				currentBuild.result = "FAILED"
-				RegexTest = egexTest = ${BUILD_LOG_REGEX, regex="^Failed*",showTruncatedLines = false, maxMatches = 1,  linesAfter= 2}
+				RegexTest = ${BUILD_LOG_REGEX, regex="^Failed*",showTruncatedLines = false, maxMatches = 1,  linesAfter= 2}
 				notifyBuild(currentBuild.result, stageName)	
 				exit ;
 			}
