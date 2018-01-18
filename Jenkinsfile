@@ -162,6 +162,7 @@ def notifyBuild(String buildStatus = 'STARTED', String stageName) {
   <p>Branch: Branch utilizada para o publish ${env.BRANCH_NAME}</p>
   <p>Por favor verifique o log para mais informacoes</p>
   <hr>
+  <p><img src="https://itisatechiesworld.files.wordpress.com/2015/01/cool-jenkins2x3.png?w=200"></p>
   </br>
  """
  
@@ -184,9 +185,7 @@ def notifyBuild(String buildStatus = 'STARTED', String stageName) {
 	  mimeType: 'text/html',
 	  attachLog: true,
       subject: subject,
-      body: details '''"<p>${BUILD_LOG_REGEX, regex="^Failed*",showTruncatedLines = false, maxMatches = 1,  linesAfter= 2}</p>
-	  <hr>
-	  <p><img src="https://itisatechiesworld.files.wordpress.com/2015/01/cool-jenkins2x3.png?w=200"></p>"''',
+      body: details,
       to: "aline.campos@ventron.com.br"
     ) 
 }
