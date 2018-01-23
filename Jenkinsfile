@@ -187,7 +187,7 @@ def notifyBuild(String buildStatus = 'STARTED', String stageName) {
   <p>Branch: Branch utilizada para o publish ${env.BRANCH_NAME}</p>
   <p>Por favor verifique o log para mais informacoes</p>
   <hr>
-  <p><img src="https://itisatechiesworld.files.wordpress.com/2015/01/cool-jenkins2x3.png?w=200"></p>
+  <p><img src="https://www.cloudbees.com/sites/default/files/blogger_importer/s320/Jenkins_Butler.png"></p>
   </br>
  """
  
