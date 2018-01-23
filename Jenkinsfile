@@ -36,10 +36,12 @@ int returUpload = 0;
 String stageName = "";
 
 node {
+	/*
 	if(!hudson.model.Result.SUCCESS.equals(currentBuild.rawBuild.getPreviousBuild()?.getResult())) {
 		echo "last build failed"
 	}
 	else {
+		*/
     try{
 		stage('Checkout') {
 			checkout scm
@@ -184,8 +186,8 @@ node {
 	finally {
 		bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rename_dir.ps1"', returnStatus: true)
 	}
-		echo "Deu certo"
-	}
+	//	echo "Deu certo"
+	//}
 }
 
 
