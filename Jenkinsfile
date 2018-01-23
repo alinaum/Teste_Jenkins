@@ -229,6 +229,6 @@ def notifyBuild(String buildStatus = 'STARTED', String stageName) {
 	  attachLog: true,
       subject: subject,
       body: details,
-      to: "aline.campos@ventron.com.br"
+      to: "email@teste.com.br"
     ) 
 }
