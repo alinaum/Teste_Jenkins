@@ -47,6 +47,7 @@ node {
 		bat (script:'"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Release-Branch\\workspace\\MedgrupoAPI.sln" /property:Configuration=Release')	
 			
 	}
+	/*
 	stage("Test") {
 		stageName = "Testes"
 		returOrder = bat (script:'"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Release-Branch\\workspace\\Medgrupo.RestfulService.Tests\\Ordered\\TrocaDevice.orderedtest"', returnStatus: true)						
@@ -68,21 +69,9 @@ node {
 		}
 		
 		
-	}	
-	
-	stage("Backup"){       
-		returBack = bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\backup_script.ps1"', returnStatus: true )
-		stageName = "Backup"
-		if(returBack != 0){
-			currentBuild.result = "FAILED"
-			notifyBuild(currentBuild.result, "Backup")
-			error 'Backup Error'
-		}
-		else{
-			echo "Backup"
-		}
-
 	}
+*/	
+	
 	stage("DLL") {
 		String DLLS = "E:\\ScriptsJenkins\\Scripts\\git_scripts\\DLL_separator.ps1";
 		returDll = bat (script: 'powershell "'+DLLS+'"', returnStatus: true)
@@ -96,6 +85,21 @@ node {
 			echo "Preparar Publish"
 		}
 	}	
+	
+		stage("Backup"){       
+		returBack = bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\backup_script.ps1"', returnStatus: true )
+		stageName = "Backup"
+		if(returBack != 0){
+			currentBuild.result = "FAILED"
+			notifyBuild(currentBuild.result, "Backup")
+			error 'Backup Error'
+		}
+		else{
+			echo "Backup"
+		}
+
+	}
+	
 	stage("UploadFTP"){       
 		returUpload = bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\UPLOAD_FTP.ps1"', returnStatus: true)
 		stageName = "UploadFTP"
