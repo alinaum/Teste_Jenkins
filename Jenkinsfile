@@ -36,7 +36,7 @@ int returUpload = 0;
 String stageName = "";
 
 node {
-    
+    try{
     stage('Checkout') {
         checkout scm
 		stageName = "Checkout"
@@ -177,6 +177,11 @@ node {
 		}
 	}
 }
+finally {
+    bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rename_dir.ps1"', returnStatus: true)
+}
+
+
  
 def notifyBuild(String buildStatus = 'STARTED', String stageName) {
   // build status of null means successful
