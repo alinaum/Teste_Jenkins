@@ -41,16 +41,16 @@ node {
 	}
 	else {
     try{
-    stage('Checkout') {
-        checkout scm
-		stageName = "Checkout"
-    }
-	
-    stage("MSBUILD"){
-		stageName = "MSBUILD"
-		bat (script:'"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Release-Branch\\workspace\\MedgrupoAPI.sln" /property:Configuration=Release')	
-			
-	}
+		stage('Checkout') {
+			checkout scm
+			stageName = "Checkout"
+		}
+		
+		stage("MSBUILD"){
+			stageName = "MSBUILD"
+			bat (script:'"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Release-Branch\\workspace\\MedgrupoAPI.sln" /property:Configuration=Release')	
+				
+		}
 	/*
 	stage("Test") {
 		stageName = "Testes"
@@ -76,115 +76,116 @@ node {
 	}
 */	
 	
-	stage("DLL") {
-		String DLLS = "E:\\ScriptsJenkins\\Scripts\\git_scripts\\DLL_separator.ps1";
-		returDll = bat (script: 'powershell "'+DLLS+'"', returnStatus: true)
-		stageName = "Preparar Publish"
-		if(returDll != 0){
-			currentBuild.result = "FAILED"
-			notifyBuild(currentBuild.result, "Preparar Publish")
-			error 'Preparar Publish Error'
-		}
-		else{
-			echo "Preparar Publish"
-		}
-	}	
-	
-		stage("Backup"){       
-		returBack = bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\backup_script.ps1"', returnStatus: true )
-		stageName = "Backup"
-		if(returBack != 0){
-			currentBuild.result = "FAILED"
-			notifyBuild(currentBuild.result, "Backup")
-			error 'Backup Error'
-		}
-		else{
-			echo "Backup"
-		}
-
-	}
-	
-	stage("UploadFTP"){       
-		returUpload = bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\UPLOAD_FTP.ps1"', returnStatus: true)
-		stageName = "UploadFTP"
-		if(returUpload != 0){
-			currentBuild.result = "FAILED"
-			notifyBuild(currentBuild.result, "UploadFTP")
-			error 'UploadFTP Error'
-		}
-		else{
-			echo "UploadFTP"
-		}
-	}
-	
-	stage("RunScopeAntes"){
-    
-		RunScopeOk = bat (script: '"C:\\Python27\\python.exe" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\runscope_python.py"', returnStatus: true)
-		if(RunScopeOk == 0){
-			notifyBuild(currentBuild.result, "RunScope Antes")
-		}
-		else{
-			currentBuild.result = "FAILED"
-			notifyBuild(currentBuild.result, "RunScope Antes")			
-		}
-	}
-	
-	stage("Rollback"){
-		if (RunScopeOk != 0){
-			echo "Rollback";
-			def powerSRollback1 = bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
-			if(powerSRollback1 == 0){
-				echo "ok";
-				notifyBuild(currentBuild.result, "Rollback" )
-				error "Rollback feito"
-			}else{
-				echo "Erro no Rollback";
+		stage("DLL") {
+			String DLLS = "E:\\ScriptsJenkins\\Scripts\\git_scripts\\DLL_separator.ps1";
+			returDll = bat (script: 'powershell "'+DLLS+'"', returnStatus: true)
+			stageName = "Preparar Publish"
+			if(returDll != 0){
 				currentBuild.result = "FAILED"
-				notifyBuild(currentBuild.result, "Rollback" )
-				error 'Rollback Error'
+				notifyBuild(currentBuild.result, "Preparar Publish")
+				error 'Preparar Publish Error'
+			}
+			else{
+				echo "Preparar Publish"
+			}
+		}	
+		
+			stage("Backup"){       
+			returBack = bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\backup_script.ps1"', returnStatus: true )
+			stageName = "Backup"
+			if(returBack != 0){
+				currentBuild.result = "FAILED"
+				notifyBuild(currentBuild.result, "Backup")
+				error 'Backup Error'
+			}
+			else{
+				echo "Backup"
+			}
+	
+		}
+	
+		stage("UploadFTP"){       
+			returUpload = bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\UPLOAD_FTP.ps1"', returnStatus: true)
+			stageName = "UploadFTP"
+			if(returUpload != 0){
+				currentBuild.result = "FAILED"
+				notifyBuild(currentBuild.result, "UploadFTP")
+				error 'UploadFTP Error'
+			}
+			else{
+				echo "UploadFTP"
 			}
 		}
-		else{
-			echo "Sem Rollback";
-		}
-	}
 	
-	stage("RunScopeDepoisDoLoadBalance"){
-		sleep time: 6, unit: 'MINUTES';
-		RunScopeDepoisDoLoadBalanceOk = bat (script: '"C:\\Python27\\python.exe" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\runscope_python.py"', returnStatus: true)
-		if(RunScopeDepoisDoLoadBalanceOk == 0){
-			notifyBuild(currentBuild.result, "RunScope Depois Do LoadBalance")
-		}
-		else{
-			currentBuild.result = "FAILED"
-			notifyBuild(currentBuild.result, "RunScope Depois Do LoadBalance")
-		}
-	}
-	
-	stage("RollbackDepoisDoLoadBalance"){
-		if (RunScopeDepoisDoLoadBalanceOk != 0){
-			echo "RollbackDepoisDoLoadBalance";
-			def powerSRollback2 = bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
-			if(powerSRollback2 == 0){
-				echo "RollbackDepoisDoLoadBalance ok";
-				notifyBuild(currentBuild.result, "Rollback Depois Do LoadBalance")
-				error 'Rollback Depois Do LoadBalance Feito'
-				
-			}else{
+		stage("RunScopeAntes"){
+		
+			RunScopeOk = bat (script: '"C:\\Python27\\python.exe" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\runscope_python.py"', returnStatus: true)
+			if(RunScopeOk == 0){
+				notifyBuild(currentBuild.result, "RunScope Antes")
+			}
+			else{
 				currentBuild.result = "FAILED"
-				notifyBuild(currentBuild.result, "Rollback Depois Do LoadBalance")
-				error 'Rollback Depois Do LoadBalance Error'
+				notifyBuild(currentBuild.result, "RunScope Antes")			
 			}
 		}
-		else{
-			echo "Sem RollbackDepoisDoLoadBalance";
+	
+		stage("Rollback"){
+			if (RunScopeOk != 0){
+				echo "Rollback";
+				def powerSRollback1 = bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
+				if(powerSRollback1 == 0){
+					echo "ok";
+					notifyBuild(currentBuild.result, "Rollback" )
+					error "Rollback feito"
+				}else{
+					echo "Erro no Rollback";
+					currentBuild.result = "FAILED"
+					notifyBuild(currentBuild.result, "Rollback" )
+					error 'Rollback Error'
+				}
+			}
+			else{
+				echo "Sem Rollback";
+			}
+		}
+	
+		stage("RunScopeDepoisDoLoadBalance"){
+			sleep time: 6, unit: 'MINUTES';
+			RunScopeDepoisDoLoadBalanceOk = bat (script: '"C:\\Python27\\python.exe" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\runscope_python.py"', returnStatus: true)
+			if(RunScopeDepoisDoLoadBalanceOk == 0){
+				notifyBuild(currentBuild.result, "RunScope Depois Do LoadBalance")
+			}
+			else{
+				currentBuild.result = "FAILED"
+				notifyBuild(currentBuild.result, "RunScope Depois Do LoadBalance")
+			}
+		}
+	
+		stage("RollbackDepoisDoLoadBalance"){
+			if (RunScopeDepoisDoLoadBalanceOk != 0){
+				echo "RollbackDepoisDoLoadBalance";
+				def powerSRollback2 = bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
+				if(powerSRollback2 == 0){
+					echo "RollbackDepoisDoLoadBalance ok";
+					notifyBuild(currentBuild.result, "Rollback Depois Do LoadBalance")
+					error 'Rollback Depois Do LoadBalance Feito'
+					
+				}else{
+					currentBuild.result = "FAILED"
+					notifyBuild(currentBuild.result, "Rollback Depois Do LoadBalance")
+					error 'Rollback Depois Do LoadBalance Error'
+				}
+			}
+			else{
+				echo "Sem RollbackDepoisDoLoadBalance";
+			}
 		}
 	}
-}
-finally {
-    bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rename_dir.ps1"', returnStatus: true)
-}
- echo "Deu certo"
+	finally {
+		bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rename_dir.ps1"', returnStatus: true)
+	}
+		echo "Deu certo"
+	}
 }
 
 
