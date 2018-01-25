@@ -26,169 +26,160 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.*;
 
-int RunScopeOk = 0;
-int RunScopeDepoisDoLoadBalanceOk = 0;
+
 int returOrder = 0;
 int returUnit = 0;
-int returBack = 0;
 int returDll = 0;
-int returUpload = 0;
 String stageName = "";
 
 node {
+try {
 
-	if(!hudson.model.Result.SUCCESS.equals(currentBuild.rawBuild.getPreviousBuild()?.getResult())) {
-		echo "last build failed"
+	stage('Checkout') {
+		deleteDir()
+		checkout scm
+		stageName = "Checkout"
 	}
-	else {
+	
+	stage("MSBUILD Testes"){
+		stageName = "MSBUILD Testes"
+		bat (script:'"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe" "solution_path.sln" /property:Configuration=Debug')	
+			
+	}
+	stage("MSBUILD Publish"){
+		stageName = "MSBUILD Publish"
+		bat (script:'"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe" "solution_path.sln" /property:Configuration=Release')	
+			
+	}
 
-    try{
-		stage('Checkout') {
-			checkout scm
-			stageName = "Checkout"
-		}
-		
-		stage("MSBUILD"){
-			stageName = "MSBUILD"
-			bat (script:'"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Release-Branch\\workspace\\MedgrupoAPI.sln" /property:Configuration=Release')	
-				
-		}
-	/*
 	stage("Test") {
-		stageName = "Testes"
-		returOrder = bat (script:'"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Release-Branch\\workspace\\Medgrupo.RestfulService.Tests\\Ordered\\TrocaDevice.orderedtest"', returnStatus: true)						
+		returOrder = bat (script:'"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe" "ordered_teste_path"', returnStatus: true)						
 		if(returOrder != 0){
 			currentBuild.result = "FAILED"
 			notifyBuild(currentBuild.result, "Order Teste")
 			error 'Order teste error'
 		}
 		else{
-			returUnit = bat (script:'"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe" "C:\\Program Files (x86)\\Jenkins\\jobs\\Release-Branch\\workspace\\Medgrupo.RestfulService.Tests\\bin\\Release\\Medgrupo.RestfulService.Tests.dll"', returnStatus: true)
+			returUnit = bat (script:'"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe" "teste_dll_path"', returnStatus: true)
 			if(returUnit != 0){
 				currentBuild.result = "FAILED"
-				notifyBuild(currentBuild.result, "Test Unitario")
+				notifyBuild(currentBuild.result, "Teste Unitario")
 				error 'Erro teste unitario'
 			}
 			else{
-				echo "Test unitario ok"
+				stage("DLL") {	
+					String DLLS = "E:\\ScriptsJenkins\\Scripts\\git_scripts\\DLL_separator.ps1";
+					returDll = bat (script: 'powershell "'+DLLS+'"', returnStatus: true)
+					if(returDll != 0){
+						currentBuild.result = "FAILED"
+						notifyBuild(currentBuild.result, "Preparar Publish")
+						error 'Preparar Publish Error'
+					}
+					else{
+						echo "Preparar Publish"
+						notifyBuild(currentBuild.result, "Preparar Publish")
+					}
+				}
 			}
 		}
 		
 		
 	}
-*/	
+	stage("Backup"){       
+		returBack = bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\backup_script.ps1"', returnStatus: true )
+		stageName = "Backup"
+		if(returBack != 0){
+			currentBuild.result = "FAILED"
+			notifyBuild(currentBuild.result, "Backup")
+			error 'Backup Error'
+		}
+		else{
+			echo "Backup"
+		}
 	
-		stage("DLL") {
-			String DLLS = "E:\\ScriptsJenkins\\Scripts\\git_scripts\\DLL_separator.ps1";
-			returDll = bat (script: 'powershell "'+DLLS+'"', returnStatus: true)
-			stageName = "Preparar Publish"
-			if(returDll != 0){
+	}
+	
+	stage("UploadFTP"){       
+		returUpload = bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\UPLOAD_FTP.ps1"', returnStatus: true)
+		stageName = "UploadFTP"
+		if(returUpload != 0){
+			currentBuild.result = "FAILED"
+			notifyBuild(currentBuild.result, "UploadFTP")
+			error 'UploadFTP Error'
+		}
+		else{
+			echo "UploadFTP"
+		}
+	}
+	
+	stage("RunScopeAntes"){
+	
+		RunScopeOk = bat (script: '"C:\\Python27\\python.exe" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\runscope_python.py"', returnStatus: true)
+		if(RunScopeOk == 0){
+			notifyBuild(currentBuild.result, "RunScope Antes")
+		}
+		else{
+			currentBuild.result = "FAILED"
+			notifyBuild(currentBuild.result, "RunScope Antes")			
+		}
+	}
+	
+	stage("Rollback"){
+		if (RunScopeOk != 0){
+			echo "Rollback";
+			def powerSRollback1 = bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
+			if(powerSRollback1 == 0){
+				echo "ok";
+				notifyBuild(currentBuild.result, "Rollback" )
+			}else{
+				echo "Erro no Rollback";
 				currentBuild.result = "FAILED"
-				notifyBuild(currentBuild.result, "Preparar Publish")
-				error 'Preparar Publish Error'
+				notifyBuild(currentBuild.result, "Rollback" )
+				error 'Rollback Error'
 			}
-			else{
-				echo "Preparar Publish"
-			}
-		}	
-		
-			stage("Backup"){       
-			returBack = bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\backup_script.ps1"', returnStatus: true )
-			stageName = "Backup"
-			if(returBack != 0){
+		}
+		else{
+			echo "Sem Rollback";
+		}
+	}
+	
+	stage("RunScopeDepoisDoLoadBalance"){
+		sleep time: 6, unit: 'MINUTES';
+		RunScopeDepoisDoLoadBalanceOk = bat (script: '"C:\\Python27\\python.exe" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\runscope_python.py"', returnStatus: true)
+		if(RunScopeDepoisDoLoadBalanceOk == 0){
+			notifyBuild(currentBuild.result, "RunScope Depois Do LoadBalance")
+		}
+		else{
+			currentBuild.result = "FAILED"
+			notifyBuild(currentBuild.result, "RunScope Depois Do LoadBalance")
+		}
+	}
+	
+	stage("RollbackDepoisDoLoadBalance"){
+		if (RunScopeDepoisDoLoadBalanceOk != 0){
+			echo "RollbackDepoisDoLoadBalance";
+			def powerSRollback2 = bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
+			if(powerSRollback2 == 0){
+				echo "RollbackDepoisDoLoadBalance ok";
+				notifyBuild(currentBuild.result, "Rollback Depois Do LoadBalance")
+				
+			}else{
 				currentBuild.result = "FAILED"
-				notifyBuild(currentBuild.result, "Backup")
-				error 'Backup Error'
-			}
-			else{
-				echo "Backup"
-			}
-	
-		}
-	
-		stage("UploadFTP"){       
-			returUpload = bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\UPLOAD_FTP.ps1"', returnStatus: true)
-			stageName = "UploadFTP"
-			if(returUpload != 0){
-				currentBuild.result = "FAILED"
-				notifyBuild(currentBuild.result, "UploadFTP")
-				error 'UploadFTP Error'
-			}
-			else{
-				echo "UploadFTP"
+				notifyBuild(currentBuild.result, "Rollback Depois Do LoadBalance")
+				error 'Rollback Depois Do LoadBalance Error'
 			}
 		}
-	
-		stage("RunScopeAntes"){
-		
-			RunScopeOk = bat (script: '"C:\\Python27\\python.exe" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\runscope_python.py"', returnStatus: true)
-			if(RunScopeOk == 0){
-				notifyBuild(currentBuild.result, "RunScope Antes")
-			}
-			else{
-				currentBuild.result = "FAILED"
-				notifyBuild(currentBuild.result, "RunScope Antes")			
-			}
+		else{
+			echo "Sem RollbackDepoisDoLoadBalance";
 		}
-	
-		stage("Rollback"){
-			if (RunScopeOk != 0){
-				echo "Rollback";
-				def powerSRollback1 = bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
-				if(powerSRollback1 == 0){
-					echo "ok";
-					notifyBuild(currentBuild.result, "Rollback" )
-					error "Rollback feito"
-				}else{
-					echo "Erro no Rollback";
-					currentBuild.result = "FAILED"
-					notifyBuild(currentBuild.result, "Rollback" )
-					error 'Rollback Error'
-				}
-			}
-			else{
-				echo "Sem Rollback";
-			}
-		}
-	
-		stage("RunScopeDepoisDoLoadBalance"){
-			sleep time: 6, unit: 'MINUTES';
-			RunScopeDepoisDoLoadBalanceOk = bat (script: '"C:\\Python27\\python.exe" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\runscope_python.py"', returnStatus: true)
-			if(RunScopeDepoisDoLoadBalanceOk == 0){
-				notifyBuild(currentBuild.result, "RunScope Depois Do LoadBalance")
-			}
-			else{
-				currentBuild.result = "FAILED"
-				notifyBuild(currentBuild.result, "RunScope Depois Do LoadBalance")
-			}
-		}
-	
-		stage("RollbackDepoisDoLoadBalance"){
-			if (RunScopeDepoisDoLoadBalanceOk != 0){
-				echo "RollbackDepoisDoLoadBalance";
-				def powerSRollback2 = bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rollback.ps1"', returnStatus: true)
-				if(powerSRollback2 == 0){
-					echo "RollbackDepoisDoLoadBalance ok";
-					notifyBuild(currentBuild.result, "Rollback Depois Do LoadBalance")
-					error 'Rollback Depois Do LoadBalance Feito'
-					
-				}else{
-					currentBuild.result = "FAILED"
-					notifyBuild(currentBuild.result, "Rollback Depois Do LoadBalance")
-					error 'Rollback Depois Do LoadBalance Error'
-				}
-			}
-			else{
-				echo "Sem RollbackDepoisDoLoadBalance";
-			}
-		}
+	}
 	}
 	finally {
 		bat (script: '"powershell" "E:\\ScriptsJenkins\\Scripts\\git_scripts\\rename_dir.ps1"', returnStatus: true)
 	}
 		echo "Deu certo"
-	}
 }
+
 
 
  
@@ -201,34 +192,31 @@ def notifyBuild(String buildStatus = 'STARTED', String stageName) {
   def colorCode = '#FF0000'
   def subject = "${buildStatus}: ${stageName} "
   def summary = "${subject}: Job rodou usando a (${env.BRANCH_NAME})"
-  def details = """<p>${stageName}: ${buildStatus}</p>
-  <p>Branch: Branch utilizada para o publish ${env.BRANCH_NAME}</p>
-  <p>Por favor verifique o log para mais informacoes</p>
-  <hr>
-  <p><img src="https://www.cloudbees.com/sites/default/files/blogger_importer/s320/Jenkins_Butler.png"></p>
-  </br>
- """
- 
+
   // Override default values based on build status
   if (buildStatus == 'STARTED') {
     color = 'YELLOW'
     colorCode = '#FFFF00'
+	summary = """${subject}: Job rodou usando a (${env.BRANCH_NAME}) :smirk:"""
   } else if (buildStatus == 'SUCCESSFUL') {
     color = 'GREEN'
     colorCode = '#00FF00'
+	summary = """${subject}: Job rodou usando a (${env.BRANCH_NAME}) :sunglasses:"""
+
   } else {
     color = 'RED'
     colorCode = '#FF0000'
+	summary = """${subject}: Job rodou usando a (${env.BRANCH_NAME}) :scream:"""
   }
  
-  // Send notifications
+   // Send notifications
   slackSend (color: colorCode, message: summary)
     //email
   emailext (
 	  mimeType: 'text/html',
 	  attachLog: true,
       subject: subject,
-      body: details,
+      body: '''${SCRIPT, template="templete_result_email.template"}''',
       to: "email@teste.com.br"
     ) 
 }
