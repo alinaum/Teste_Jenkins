@@ -2,4 +2,4 @@
 
 Teste para nova release
 
-Teste pull
+Teste pull sem protected
