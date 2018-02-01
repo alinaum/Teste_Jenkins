@@ -2,3 +2,4 @@
 
 Teste para nova release
 
+Teste pull
