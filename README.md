@@ -4,4 +4,4 @@ Teste para nova release
 
 Teste pull com protected
 
-Teste pull Jenkins 3
+Teste pull Jenkins 4
