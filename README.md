@@ -4,4 +4,4 @@ Teste para nova release
 
 Teste pull com protected
 
-Teste pull request plugin clone 10
+Teste pull request plugin clone 12
